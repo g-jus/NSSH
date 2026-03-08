@@ -8,7 +8,8 @@
 [![R-CMD-check](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of NSSH is to …
+The goal of NSSH is a package for easy access and exploring Norwegian
+Spring Spawning Herring data.
 
 ## Installation
 
