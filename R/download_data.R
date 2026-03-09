@@ -12,3 +12,24 @@ get_herring_data <- function() {
   data <- read.csv(tmp)
   return(data)
 }
+
+clean_data <-
+
+fit_vbgm <-
+  library(FSA)
+  ## VBGM starting values.
+  vb_start <- findGrowthStarts(length ~ age, data = herring)
+  ## VBGM equation.
+  vb_equation <- length~Linf*(1-exp(-K*(age-t0)))
+  ## Fit VBGM.
+  vb_mod <- nls(vb_equation, data = herring, start = vb_start)
+
+max_age <-
+
+max_length <-
+
+landings <-
+
+plot_growth <-
+
+shiny <-
