@@ -12,7 +12,7 @@ weight_per_year <- function(data) {
   data |>
     dplyr::group_by(year) |>
     dplyr::summarise(
-      total_weight = sum(weight, na.rm = TRUE),
+      total_weight = sum(weight, na.rm = TRUE)/1e6,
       .groups = "drop"
       )
 }

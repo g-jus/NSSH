@@ -64,10 +64,10 @@ ui <- page_navbar(
 server <- function(input, output, session) {
 
   # ------------------------------------------------------------------
-  # Importing data
+  # Importing NSSH data
   # ------------------------------------------------------------------
   herring_data <- herring_read()
-
+  clean_herring <- cleaning_herring(herring_data)
   # ------------------------------------------------------------------
   # GROWTH MODEL: Disable t0 for Gompertz
   # ------------------------------------------------------------------
@@ -78,11 +78,21 @@ server <- function(input, output, session) {
       shinyjs::enable("t0")
     }
   })
+
+  # ------------------------------------------------------------------
+  # SMALLER DATASET FOR GROWTH CURVES
+  # ------------------------------------------------------------------
+
+  growth_data_small <- reactive({
+    clean_herring |>
+      dplyr::sample_n(min(5000, nrow(clean_herring)))   # limit to 3000 points
+  })
+
   # ------------------------------------------------------------------
   # REACTIVE PREDICTION CURVE
   # ------------------------------------------------------------------
   pred_data <- reactive({
-    t <- seq(0, max(herring_data$age) + 2, length.out = 200)
+    t <- seq(0, max(clean_herring$age) + 2, length.out = 100)
 
 
     if (input$model == "VBGM") {
@@ -96,14 +106,16 @@ server <- function(input, output, session) {
 
   # Plot data + model
   output$growth_plot <- renderPlot({
-    ggplot(herring_data, aes(age, length)) +
-      geom_point(fill = "grey50", alpha = 0.5, shape = 1) +
+    ggplot(growth_data_small(), aes(age, length)) +
+      geom_point(color = "grey70", fill = "grey70", alpha = 0.2, shape = 21) +
       geom_line(data = pred_data(), aes(age, length), color = "steelblue", linewidth = 1.2) +
       labs(
         x = "Age (years)",
         y = "Length (cm)",
         title = paste("Growth model:", input$model)
       ) +
+      scale_x_continuous(breaks = seq(0, max(clean_herring$age), by = 2)) +
+      scale_y_continuous(labels = scales::label_number(accuracy = 1)) +
       theme_bw()
   })
 
@@ -112,10 +124,10 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   output$stats_plot <- renderPlot({
      df <-  if (input$stats == "Count") {
-        count_per_year(herring_data) |>
+        count_per_year(clean_herring) |>
           dplyr::rename(value = n_ids)
       } else {
-        weight_per_year(herring_data) |>
+        weight_per_year(clean_herring) |>
           dplyr::rename(value = total_weight)
       }
 
@@ -136,7 +148,7 @@ server <- function(input, output, session) {
   # AGE COMPOSITION PANEL (placeholder)
   # ------------------------------------------------------------------
   output$age_plot <- renderPlot({
-    df <- age_count_for_year(herring_data, input$year)
+    df <- age_count_for_year(clean_herring, input$year)
 
     validate(
       need(nrow(df) > 0, paste("No age data available for year", input$year))
@@ -155,11 +167,8 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   # MAP PANEL — Leaflet placeholder
   # ------------------------------------------------------------------
-  herring_data$lon <- as.numeric(herring_data$lon)
-  herring_data$lat <- as.numeric(herring_data$lat)
-
   filtered_catches <- reactive({
-    location_catches(herring_data, input$map_year) |>
+    location_catches(clean_herring, input$map_year) |>
     filter_ocean_points()
   })
 

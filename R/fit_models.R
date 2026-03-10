@@ -28,3 +28,4 @@ fit_gompertz <- function(data) {
                  k = 0.2,
                  a = 1))
 }
+

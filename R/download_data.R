@@ -10,3 +10,19 @@ herring_read <- function() {
   return(data)
 }
 
+cleaning_herring <- function(data) {
+  data |>
+    dplyr::mutate(
+      weight = suppressWarnings(as.numeric(weight)),
+      age    = suppressWarnings(as.numeric(age)),
+      lon    = suppressWarnings(as.numeric(lon)),
+      lat    = suppressWarnings(as.numeric(lat))
+    ) |>
+    dplyr::filter(
+      !is.na(weight),
+      !is.na(age),
+      !is.na(lon),
+      !is.na(lat),
+      age > 0,
+      weight > 0)
+}
