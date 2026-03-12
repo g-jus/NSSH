@@ -1,15 +1,31 @@
+Norwegian Spring Spawning Herring explorer
+================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# NSSH
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of NSSH is a package for easy access and exploring Norwegian
-Spring Spawning Herring data.
+# Herring Data Explorer
+
+The **Herring Data Explorer** is an R package that combines a fully
+interactive **Shiny application** with a reproducible **{targets}
+pipeline** for working with Norwegian Spring-Spawning Herring (NSSH)
+data.
+
+The app provides:
+
+- Dynamic **growth model visualizations** (VBGM & Gompertz)
+- Annual statistics such as **counts** and **weights** per year
+- Detailed **age composition** plots
+- An interactive **leaflet map** of catch locations
+- A full `{targets}` pipeline for data import, cleaning, summarizing,
+  and mapping
+
+The goal is to offer a clean, transparent, and reproducible workflow for
+herring data exploration.
 
 ## Installation
 

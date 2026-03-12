@@ -9,7 +9,7 @@ library(targets)
 
 # Set target options:
 tar_option_set(
-  packages = c("shiny", "bslib", "shinyjs", "dplyr", "ggplot2", "leaflet", "tibble") # Packages that your targets need for their tasks.
+  packages = c("dplyr") # Packages that your targets need for their tasks.
   # format = "qs", # Optionally set the default storage format. qs is fast.
   #
   # Pipelines that take a long time to run may benefit from
@@ -48,15 +48,6 @@ tar_option_set(
 # tar_source()
 # tar_source("other_functions.R") # Source other scripts as needed.
 
-# Helper to make sampling reproducible without affecting global state
-with_seed <- function(seed, code) {
-  old <- .Random.seed
-  on.exit({ if (exists(".Random.seed", inherits = FALSE)) .Random.seed <<- old }, add = TRUE)
-  set.seed(seed)
-  force(code)
-}
-
-
 # Replace the target list below with your own:
 list(
   #-----------------------------------------------------------------------------
@@ -72,8 +63,10 @@ list(
   #-----------------------------------------------------------------------------
   # Pre-sample data for growth model illustration.
   tar_target(
-    growth_data_small,
-    with_seed(202403, dplyr::sample_n(clean_herring, min(5000, nrow(clean_herring))))),
+    growth_data_small, {
+    set.seed(202603)
+    dplyr::sample_n(clean_herring, min(5000, nrow(clean_herring)))
+    }),
 
   #-----------------------------------------------------------------------------
   # Domain values for Shiny sliders/prediction grid.

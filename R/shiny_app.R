@@ -1,24 +1,45 @@
-library(shiny)
-library(bslib)
-library(shinyjs)
-library(ggplot2)
-library(leaflet)
+#' Launch the Herring Data Explorer Shiny App
+#'
+#' This function starts the Shiny application included in the package.
+#' The app provides interactive visualizations for growth models,
+#' yearly statistics, age composition, and mapping of NSSH catch locations.
+#'
+#' @return A Shiny application object. Running this function launches the app.
+#'
+#' @examples
+#' \dontrun{
+#'   run_app()
+#' }
+#'
+#' @export
+run_app <- function() {
+  shiny::shinyApp(ui, server)
+}
 
 ui <- page_navbar(
   title = "Herring Data Explorer",
+  header = shinyjs::useShinyjs(),
+
+  # ----------------------------------------------------------------------------
+  # Growth models tab.
+  # ----------------------------------------------------------------------------
   nav_panel(
     "Growth Models",
     layout_sidebar(
       sidebar = sidebar(
         selectInput("model", "Model", c("VBGM", "Gompertz")),
-        sliderInput("Linf", "Linf", 0, 70, 40),
-        sliderInput("k", "k", 0.01, 1, 0.2),
-        sliderInput("t0", "t0", -2, 2, 0)
-        sliderInput("a", "a", -2, 2, 1)
+        sliderInput("Linf", "Linf", min = 0, max = 70, value = 40),
+        sliderInput("k", "k", min = 0.01, max = 1, value = 0.2),
+        sliderInput("t0", "t0", min = -2, max = 2, value = 0),
+        sliderInput("a", "a", min = -2, max = 2, value = 1)
       ),
       plotOutput("growth_plot")
     )
   ),
+
+  # ----------------------------------------------------------------------------
+  # Statistics per year tab
+  # ----------------------------------------------------------------------------
   nav_panel(
     "Statistics",
     layout_sidebar(
@@ -28,40 +49,41 @@ ui <- page_navbar(
       plotOutput("stats_plot")
     )
   ),
+
+  # ----------------------------------------------------------------------------
+  # Age composition per year tab.
+  # ----------------------------------------------------------------------------
   nav_panel(
     "Age Composition",
     layout_sidebar(
       sidebar = sidebar(
-        sliderInput("year", "Year",
-                    min = 1935,
-                    max = 2019,
-                    value = 2000,
-                    sep = "",
-                    step = 1
-                    )
-        )
-      ),
-      plotOutput("age_plot")
+        sliderInput(
+          "year", "Year",
+          min = 1935, max = 2019, value = 2000,
+          sep = "", step = 1
+          )
+        ),
+        plotOutput("age_plot")
+    )
   ),
+
+  # ----------------------------------------------------------------------------
+  # Map of catch per year tab.
+  # ----------------------------------------------------------------------------
   nav_panel(
     "Map",
     layout_sidebar(
       sidebar = sidebar(
         sliderInput(
-          "map_year",
-          "Year",
-          min = 1935,
-          max = 2019,
-          value = 2000,
-          sep = "",
-          step = 1
-        )
+          "map_year", "Year",
+          min = 1935, max = 2019, value = 2000,
+          sep = "", step = 1
+          )
       ),
       leafletOutput("map", height = "600px")
     )
   )
 )
-
 
 server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
@@ -180,7 +202,3 @@ server <- function(input, output, session) {
       leaflet::fitBounds(min(df$lon), min(df$lat), max(df$lon), max(df$lat))
   })
 }
-
-shinyApp(ui, server)
-
-
