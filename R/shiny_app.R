@@ -71,7 +71,7 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   # GROWTH MODEL: Disable t0 for Gompertz
   # ------------------------------------------------------------------
-  observeEvent(input$growth_model, {
+  observeEvent(input$model, {
     if (input$model == "Gompertz") {
       shinyjs::disable("t0")
     } else {
@@ -85,14 +85,14 @@ server <- function(input, output, session) {
 
   growth_data_small <- reactive({
     clean_herring |>
-      dplyr::sample_n(min(5000, nrow(clean_herring)))   # limit to 3000 points
+      dplyr::sample_n(min(5000, nrow(clean_herring)))
   })
 
   # ------------------------------------------------------------------
   # REACTIVE PREDICTION CURVE
   # ------------------------------------------------------------------
   pred_data <- reactive({
-    t <- seq(0, max(clean_herring$age) + 2, length.out = 100)
+    t <- seq(0, max(herring_data$age) + 2, length.out = 100)
 
 
     if (input$model == "VBGM") {
@@ -115,7 +115,7 @@ server <- function(input, output, session) {
         title = paste("Growth model:", input$model)
       ) +
       scale_x_continuous(breaks = seq(0, max(clean_herring$age), by = 2)) +
-      scale_y_continuous(labels = scales::label_number(accuracy = 1)) +
+      #scale_y_continuous(labels = scales::label_number(accuracy = 1)) + ## Richard?
       theme_bw()
   })
 
@@ -123,7 +123,7 @@ server <- function(input, output, session) {
   # STATS PANEL
   # ------------------------------------------------------------------
   output$stats_plot <- renderPlot({
-     df <-  if (input$stats == "Count") {
+     df <-  if (input$stats == "Counts") {
         count_per_year(clean_herring) |>
           dplyr::rename(value = n_ids)
       } else {
@@ -132,7 +132,7 @@ server <- function(input, output, session) {
       }
 
 
-    y_lab <- if (input$stats == "Count") "Number of fish (unique IDs)" else "Total weight"
+    y_lab <- if (input$stats == "Counts") "Number of fish (unique IDs)" else "Total weight"
     ttl   <- paste(input$stats, "of NSSH per year")
 
     ggplot(df, aes(x = year, y = value)) +
@@ -193,3 +193,5 @@ server <- function(input, output, session) {
   })
 }
 shinyApp(ui, server)
+
+

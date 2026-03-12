@@ -23,3 +23,4 @@ vbgm <- function(t, L_inf, k, t0) {
 gompertz_model <- function(t, L_inf, k, a) {
   L_inf * exp(-a * exp(-k * t))
 }
+
