@@ -9,7 +9,7 @@ library(targets)
 
 # Set target options:
 tar_option_set(
-  packages = c("shiny", "bslib", "shinyjs", "dplyr", "ggplot2", "leaflet") # Packages that your targets need for their tasks.
+  packages = c("shiny", "bslib", "shinyjs", "dplyr", "ggplot2", "leaflet", "tibble") # Packages that your targets need for their tasks.
   # format = "qs", # Optionally set the default storage format. qs is fast.
   #
   # Pipelines that take a long time to run may benefit from
@@ -45,18 +45,81 @@ tar_option_set(
 )
 
 # Run the R scripts in the R/ folder with your custom functions:
-tar_source()
+# tar_source()
 # tar_source("other_functions.R") # Source other scripts as needed.
+
+# Helper to make sampling reproducible without affecting global state
+with_seed <- function(seed, code) {
+  old <- .Random.seed
+  on.exit({ if (exists(".Random.seed", inherits = FALSE)) .Random.seed <<- old }, add = TRUE)
+  set.seed(seed)
+  force(code)
+}
+
 
 # Replace the target list below with your own:
 list(
+  #-----------------------------------------------------------------------------
+  # Data preparation.
+  #-----------------------------------------------------------------------------
+  # Import of data.
+  tar_target(herring_data, herring_read()),
+  # Cleaning data.
+  tar_target(clean_herring, cleaning_herring(herring_data)),
+
+  #-----------------------------------------------------------------------------
+  # Small reproducible sample for growth plot.
+  #-----------------------------------------------------------------------------
+  # Pre-sample data for growth model illustration.
   tar_target(
-    name = data,
-    command = tibble(x = rnorm(100), y = rnorm(100))
-    # format = "qs" # Efficient storage for general data objects.
-  ),
-  tar_target(
-    name = model,
-    command = coefficients(lm(y ~ x, data = data))
-  )
+    growth_data_small,
+    with_seed(202403, dplyr::sample_n(clean_herring, min(5000, nrow(clean_herring))))),
+
+  #-----------------------------------------------------------------------------
+  # Domain values for Shiny sliders/prediction grid.
+  #-----------------------------------------------------------------------------
+  # Maximum age for generating prediction grid
+  tar_target(max_age, max(clean_herring$age, na.rm = TRUE)),
+
+  #-----------------------------------------------------------------------------
+  # Stats per year functions.
+  #-----------------------------------------------------------------------------
+  # Number of unique ID and ID numbers per year.
+  tar_target(counts_per_year, count_per_year(clean_herring)),
+  # Total weight (tonnes) per year.
+  tar_target(weights_per_year, weight_per_year(clean_herring)),
+
+  #-----------------------------------------------------------------------------
+  # Age composition function.
+  #-----------------------------------------------------------------------------
+  # Age composition per year.
+  tar_target(age_counts, age_count_for_year(clean_herring)),
+
+  #-----------------------------------------------------------------------------
+  # Mapping functions.
+  #-----------------------------------------------------------------------------
+  # Summary of fish per lat/lon and year.
+  tar_target(catch_locations_all, location_catches_summary(clean_herring)),
+  # Filtering locations for simpler map.
+  tar_target(catch_locations_ocean, filter_ocean_points(catch_locations_all))
+
+  #-----------------------------------------------------------------------------
+  # QC (fail fast)
+  #-----------------------------------------------------------------------------
+  tar_target(qc_non_empty_clean, {
+    if (nrow(clean_herring) == 0L) stop("QC: clean_herring has 0 rows."); TRUE
+  }),
+  tar_target(qc_age_ok, {
+    if (!is.finite(max_age) || max_age < 1)
+      stop("QC: max_age invalid or too small.")
+    TRUE
+  }),
+  tar_target(qc_mapping_coords, {
+    rng_lon <- range(catch_locations_ocean$lon, na.rm = TRUE)
+    rng_lat <- range(catch_locations_ocean$lat, na.rm = TRUE)
+    if (any(!is.finite(rng_lon)) || any(!is.finite(rng_lat))) {
+      stop("QC: invalid lon/lat in catch_locations_ocean.")
+    }
+    TRUE
+  })
 )

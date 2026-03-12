@@ -14,6 +14,7 @@ ui <- page_navbar(
         sliderInput("Linf", "Linf", 0, 70, 40),
         sliderInput("k", "k", 0.01, 1, 0.2),
         sliderInput("t0", "t0", -2, 2, 0)
+        sliderInput("a", "a", -2, 2, 1)
       ),
       plotOutput("growth_plot")
     )
@@ -61,137 +62,125 @@ ui <- page_navbar(
   )
 )
 
-server <- function(input, output, session) {
 
-  # ------------------------------------------------------------------
-  # Importing NSSH data
-  # ------------------------------------------------------------------
-  herring_data <- herring_read()
-  clean_herring <- cleaning_herring(herring_data)
-  # ------------------------------------------------------------------
-  # GROWTH MODEL: Disable t0 for Gompertz
-  # ------------------------------------------------------------------
+server <- function(input, output, session) {
+  #-----------------------------------------------------------------------------
+  # Read precomputed targets
+  #-----------------------------------------------------------------------------
+  clean_herring      <- targets::tar_read(clean_herring)
+  growth_data_small  <- targets::tar_read(growth_data_small)
+  max_age            <- targets::tar_read(max_age)
+  counts_per_year    <- targets::tar_read(counts_per_year)
+  weights_per_year   <- targets::tar_read(weights_per_year)
+  age_counts         <- targets::tar_read(age_counts)
+  catch_locations    <- targets::tar_read(catch_locations_ocean)
+
+  #-----------------------------------------------------------------------------
+  # VBGM and Gompertz growth model
+  #-----------------------------------------------------------------------------
+  # Default state for VBGM:
+  shinyjs::enable("t0")
+  shinyjs::disable("a")
+
+  # Enable/disable t0/a parameter for VBGM/Gompertz.
   observeEvent(input$model, {
     if (input$model == "Gompertz") {
       shinyjs::disable("t0")
-    } else {
+      shinyjs::enable("a")
+    } else {  # VBGM
       shinyjs::enable("t0")
+      shinyjs::disable("a")
     }
   })
 
-  # ------------------------------------------------------------------
-  # SMALLER DATASET FOR GROWTH CURVES
-  # ------------------------------------------------------------------
-
-  growth_data_small <- reactive({
-    clean_herring |>
-      dplyr::sample_n(min(5000, nrow(clean_herring)))
-  })
-
-  # ------------------------------------------------------------------
-  # REACTIVE PREDICTION CURVE
-  # ------------------------------------------------------------------
+  # Predict growth models curves with imput data from UI.
   pred_data <- reactive({
-    t <- seq(0, max(herring_data$age) + 2, length.out = 100)
-
-
+    t <- seq(0, max_age + 2, length.out = 100)
     if (input$model == "VBGM") {
-      length_pred <- vbgm(t, input$Linf, input$k, input$t0)
+      len <- vbgm(t, input$Linf, input$k, input$t0)
     } else {
-      length_pred <- gompertz_model(t, input$Linf, input$k, a = 1)
+      len <- gompertz_model(t, input$Linf, input$k, input$a)
+    }
+    tibble::tibble(age = t, length = len)
+  })
+
+  # Plot growth models.
+  output$growth_plot <- renderPlot({
+    ggplot2::ggplot(growth_data_small, ggplot2::aes(age, length)) +
+      ggplot2::geom_point(color = "grey70", alpha = 0.2) +
+      ggplot2::geom_line(data = pred_data(), ggplot2::aes(age, length),
+                         color = "steelblue", linewidth = 1.2) +
+      ggplot2::labs(x = "Age (years)", y = "Length (cm)",
+                    title = paste("Growth model:", input$model)) +
+      ggplot2::scale_x_continuous(breaks = seq(0, max_age, by = 2)) +
+      ggplot2::theme_bw()
+  })
+
+  #-----------------------------------------------------------------------------
+  # Stats per year.
+  #-----------------------------------------------------------------------------
+  # UI choose if stats show counts or weight.
+  output$stats_plot <- renderPlot({
+    if (input$stats == "Counts") {
+      df   <- dplyr::rename(counts_per_year, value = n_ids)
+      ylab <- "Number of fish (unique IDs)"
+    } else {
+      df   <- dplyr::rename(weights_per_year, value = total_weight)
+      ylab <- "Total weight (tonnes)"
     }
 
-    data.frame(age = t, length = length_pred)
-  })
-
-  # Plot data + model
-  output$growth_plot <- renderPlot({
-    ggplot(growth_data_small(), aes(age, length)) +
-      geom_point(color = "grey70", fill = "grey70", alpha = 0.2, shape = 21) +
-      geom_line(data = pred_data(), aes(age, length), color = "steelblue", linewidth = 1.2) +
-      labs(
-        x = "Age (years)",
-        y = "Length (cm)",
-        title = paste("Growth model:", input$model)
-      ) +
-      scale_x_continuous(breaks = seq(0, max(clean_herring$age), by = 2)) +
-      #scale_y_continuous(labels = scales::label_number(accuracy = 1)) + ## Richard?
-      theme_bw()
+  # Plot stats per year plot.
+    ggplot2::ggplot(df, ggplot2::aes(year, value)) +
+      ggplot2::geom_col(fill = "steelblue") +
+      ggplot2::labs(x = "Year", y = ylab,
+                    title = paste(input$stats, "of NSSH per year")) +
+      ggplot2::theme_bw()
   })
 
   # ------------------------------------------------------------------
-  # STATS PANEL
+  # Age composition per year.
   # ------------------------------------------------------------------
-  output$stats_plot <- renderPlot({
-     df <-  if (input$stats == "Counts") {
-        count_per_year(clean_herring) |>
-          dplyr::rename(value = n_ids)
-      } else {
-        weight_per_year(clean_herring) |>
-          dplyr::rename(value = total_weight)
-      }
-
-
-    y_lab <- if (input$stats == "Counts") "Number of fish (unique IDs)" else "Total weight"
-    ttl   <- paste(input$stats, "of NSSH per year")
-
-    ggplot(df, aes(x = year, y = value)) +
-      geom_col(fill = "steelblue") +
-      labs(
-        x = "Year",
-        y = y_lab,
-        title = ttl
-      ) +
-      theme_bw()
-  })
-  # ------------------------------------------------------------------
-  # AGE COMPOSITION PANEL (placeholder)
-  # ------------------------------------------------------------------
+  # Filter age plot on UI year input.
   output$age_plot <- renderPlot({
-    df <- age_count_for_year(clean_herring, input$year)
+    df <- age_counts |> dplyr::filter(year == input$year)
 
-    validate(
-      need(nrow(df) > 0, paste("No age data available for year", input$year))
-    )
+  # Validate input from slider, that there is age data at input year.
+    validate(need(nrow(df) > 0, paste("No age data for", input$year)))
 
-    ggplot(df, aes(x = factor(age), y = n)) +
-      geom_col(fill = "steelblue") +
-      labs(
+  # Plot of age composition in choosen year.
+    ggplot2::ggplot(df, ggplot2::aes(x = factor(age), y = n)) +
+      ggplot2::geom_col(fill = "steelblue") +
+      ggplot2::labs(
         x = "Age",
         y = "Count",
         title = paste("Age composition in", input$year)
       ) +
-      theme_bw()
+      ggplot2::theme_bw()
   })
 
   # ------------------------------------------------------------------
-  # MAP PANEL — Leaflet placeholder
+  # Interactive map per year.
   # ------------------------------------------------------------------
+  # Map the catches filtered by input year.
   filtered_catches <- reactive({
-    location_catches(clean_herring, input$map_year) |>
-    filter_ocean_points()
+    dplyr::filter(catch_locations, year == input$map_year)
   })
 
+  # Plot map.
   output$map <- leaflet::renderLeaflet({
     df <- filtered_catches()
-
     validate(need(nrow(df) > 0, "No catch points for this year (after filtering)."))
-
-    leaflet(df) |>
-      addProviderTiles(providers$CartoDB.Positron) |>
-      addCircleMarkers(
+    leaflet::leaflet(df) |>
+      leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) |>
+      leaflet::addCircleMarkers(
         lng = ~lon, lat = ~lat,
-        radius = 4,
-        fillColor = "steelblue",
-        fillOpacity = 0.7,
-        stroke = FALSE
+        radius = ~scales::rescale(n_fish, to = c(3, 12)), # if you added n_fish
+        fillColor = "steelblue", fillOpacity = 0.7, stroke = FALSE
       ) |>
-      fitBounds(
-        min(df$lon), min(df$lat),
-        max(df$lon), max(df$lat)
-      )
+      leaflet::fitBounds(min(df$lon), min(df$lat), max(df$lon), max(df$lat))
   })
 }
+
 shinyApp(ui, server)
 
 
