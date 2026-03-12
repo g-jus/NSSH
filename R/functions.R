@@ -24,12 +24,15 @@ age_count_for_year <- function(data, year_value) {
     dplyr::arrange(age)
 }
 
-location_catches <- function(data, year_value) {
+location_catches_summary <- function(data) {
   data |>
-    dplyr::filter(year == year_value) |>
-    dplyr::group_by(id)
+    dplyr::group_by(year, lon, lat) |>
+    dplyr::summarise(
+      n_fish = dplyr::n(),      # how many fish at this point
+      ids = paste(unique(id), collapse = ", "),  # optional metadata about IDs
+      .groups = "drop"
+    )
 }
-
 
 filter_ocean_points <- function(data) {
   data |>
