@@ -24,3 +24,14 @@ gompertz_model <- function(t, L_inf, k, a) {
   L_inf * exp(-a * exp(-k * t))
 }
 
+#' Logistic growth model
+#'
+#' @param t Age (numeric vector)
+#' @param Linf Asymptotic length
+#' @param k Growth rate
+#' @param t0 Inflection parameter
+#' @return Length-at-age
+#' @export
+logistic_model <- function(t, Linf, k, t0) {
+  Linf / (1 + exp(-k * (t - t0)))
+}

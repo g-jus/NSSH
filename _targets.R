@@ -45,7 +45,7 @@ tar_option_set(
 )
 
 # Run the R scripts in the R/ folder with your custom functions:
-# tar_source()
+tar_source("R")
 # tar_source("other_functions.R") # Source other scripts as needed.
 
 # Replace the target list below with your own:
@@ -87,6 +87,14 @@ list(
   #-----------------------------------------------------------------------------
   # Age composition per year.
   tar_target(age_counts, age_count_for_year(clean_herring)),
+  # Number of fish, mean and max age per year.
+  tar_target(age_summary_per_year, clean_herring |>
+      dplyr::summarise(
+        n_fish = dplyr::n(),
+        mean_age = round(mean(age, na.rm = TRUE), 2),
+        max_age  = max(age, na.rm = TRUE),
+        .by = year) |>
+        dplyr::arrange(year)),
 
   #-----------------------------------------------------------------------------
   # Mapping functions.
@@ -94,7 +102,7 @@ list(
   # Summary of fish per lat/lon and year.
   tar_target(catch_locations_all, location_catches_summary(clean_herring)),
   # Filtering locations for simpler map.
-  tar_target(catch_locations_ocean, filter_ocean_points(catch_locations_all))
+  tar_target(catch_locations_ocean, filter_ocean_points(catch_locations_all)),
 
   #-----------------------------------------------------------------------------
   # QC (fail fast)

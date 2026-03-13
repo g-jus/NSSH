@@ -26,16 +26,14 @@ weight_per_year <- function(data) {
       )
 }
 
-#' Count number of fish at each age per year.
-#'
-#' @param data Cleaned herring dataset.
-#' @return A tibble with columns age and n.
+#' Count ages for all years
+#' @param data A data frame with at least columns `year` and `age`.
+#' @return A tibble with columns: year, age, n
 #' @export
-age_count_for_year <- function(data, year_value) {
+age_count_for_year <- function(data) {
   data |>
-    dplyr::filter(year == year_value) |>
-    dplyr::count(age, name = "n") |>
-    dplyr::arrange(age)
+    dplyr::count(year, age, name = "n") |>
+    dplyr::arrange(year, age)
 }
 
 
