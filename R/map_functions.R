@@ -1,15 +1,15 @@
-#' Count number of uniqe fish IDs per year per location (lat/lon).
+#' Count number of unique fish IDs per year per location (lat/lon).
 #'
 #' @param data Cleaned herring dataset.
 #' @return A tibble with columns year, lon, lat, n_fish and ids.
 #' @export
 location_catches_summary <- function(data) {
   data |>
-    dplyr::group_by(year, lon, lat) |>
     dplyr::summarise(
-      n_fish = dplyr::n(),      # how many fish at this point
-      ids = paste(unique(id, indno), collapse = ", "),  # optional metadata about IDs
-      .groups = "drop"
+      n_fish = dplyr::n(),
+      mean_age = round(mean(age, na.rm = TRUE), 1),
+      mean_weight = round(mean(weight, na.rm = TRUE), 1),
+      .by = c(year, month, lon, lat)
     )
 }
 

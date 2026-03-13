@@ -1,4 +1,4 @@
-#' Launch the Herring Data Explorer Shiny App
+#' Launch the NSSH Data Explorer Shiny App
 #'
 #' This function starts the Shiny application included in the package.
 #' The app provides interactive visualizations for growth models,
@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#'   run_app()
+#'   run_NSSH()
 #' }
 #'
 #' @export
@@ -17,8 +17,65 @@ run_NSSH <- function() {
 }
 
 ui <- bslib::page_navbar(
-  title = "Norwegian Spring Spawning Herring (NSSH)",
+  title = "NSSH",
   header = shinyjs::useShinyjs(),
+
+  # ----------------------------------------------------------------------------
+  # Front page.
+  # ----------------------------------------------------------------------------
+  bslib::nav_panel(
+    "Home",
+    bslib::layout_columns(
+      col_widths = c(5, 7),
+      bslib::card(
+        bslib::card_body(
+          shiny::tags$h3("Norwegian Spring-Spawning Herring (NSSH)"),
+          shiny::tags$p(
+            "This application provides tools for exploring and visualizing ",
+            "data from Norwegian spring-spawning herring. You can investigate ",
+            "growth models, yearly statistics, age composition, and ",
+            "geographical patterns in catches through plots and maps."
+          ),
+          shiny::tags$p(
+            "Norwegian spring-spawning herring (", shiny::tags$em("Clupea harengus"),  "L.) is a pelagic ",
+            "saltwater fish belonging to the Atlanto-Scandian herring. The NSSH ",
+            "is an important economical, cultural and historical fisheries ",
+            "resource in Norway. The NSSH spawn during spring months on the ",
+            "west and north-west coast of Norway, before the larvae drift toward ",
+            "their nursery regions in the Barents Sea. The juvenile herring ",
+            "migrate southward and join the spawning stock after 3-4 years."
+          ),
+        )
+      ),
+      bslib::card(
+        bslib::card_body(
+          shiny::tags$figure(
+            class = "centerFigure",
+            shiny::tags$img(
+              src = "https://www.norwegianseafoodcouncil.com/siteassets/wildfish/herring/herring_fishing_1280.jpg?width=900&height=506&transform=downFill&hash=bdd56fa473ad2a89b67baa108fe3ef9b",
+              width = 670,
+            ),
+            shiny::tags$figcaption(shiny::tags$strong("Photo:"), "Grette Hillersoey / Norwegian Seafood Council")
+          )
+        )
+      )
+    ),
+    bslib::card(
+      bslib::card_body(
+        shiny::tags$h5(
+          "Resources"
+        ),
+        shiny::tags$p(
+          shiny::tags$strong("Data:"), "Institute of Marine Research (2022), HerringData [Data set] ",
+          "From: https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv"
+        ),
+        shiny::tags$p(
+        shiny::tags$strong("Source:"), "Institue of Marine Research (2025), Norwegian ",
+            "spring-spawning herring, From: https://www.hi.no/en/hi/temasider/species/herring"
+        )
+      )
+    )
+  ),
 
   # ----------------------------------------------------------------------------
   # Growth models tab.
@@ -31,7 +88,7 @@ ui <- bslib::page_navbar(
         shiny::sliderInput("Linf", "Linf", min = 0, max = 70, value = 40),
         shiny::sliderInput("k", "k", min = 0.01, max = 1, value = 0.2),
         shiny::sliderInput("t0", "t0", min = -2, max = 2, value = 0),
-        shiny::sliderInput("a", "a", min = -1, max = 1, value = 0)
+        shiny::sliderInput("a", "a", min = 0, max = 2, value = 1)
       ),
       shiny::plotOutput("growth_plot")
     )
@@ -42,33 +99,28 @@ ui <- bslib::page_navbar(
   # ----------------------------------------------------------------------------
   bslib::nav_panel(
     "Statistics",
-    bslib:: layout_sidebar(
-      sidebar = bslib::sidebar(
-        shiny::selectInput("stats", "Statistics", c("Counts","Weights"))
-      ),
-      shiny::plotOutput("stats_plot")
-    )
-  ),
-
-  # ----------------------------------------------------------------------------
-  # Age composition per year tab.
-  # ----------------------------------------------------------------------------
-  bslib::nav_panel(
-    "Age Composition",
     bslib::layout_sidebar(
       sidebar = bslib::sidebar(
         shiny::radioButtons(
-          "age_mode",
-          "Display mode",
-          c("Composition" = "comp", "Summary (mean & max)" = "summary")
+          "stats_mode", "Statistics overview",
+          c(
+            "Counts per year"     = "counts",
+            "Weights per year"    = "weights",
+            "Age composition"     = "agecomp",
+            "Age summary"         = "agesummary"
+          )
         ),
-        shiny::sliderInput(
-          "year", "Year",
-          min = 1935, max = 2019, value = 2000,
-          sep = "", step = 1
+        # Year slider for Age composition
+        shiny::conditionalPanel(
+          condition = "input.stats_mode == 'agecomp'",
+          shiny::sliderInput(
+            "year", "Year",
+            min = 1935, max = 2019, value = 2000,
+            sep = "", step = 1
+          )
         )
       ),
-      shiny::uiOutput("age_plot")
+      shiny::uiOutput("stats_body")
     )
   ),
   # ----------------------------------------------------------------------------
@@ -150,56 +202,49 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Stats per year.
   #-----------------------------------------------------------------------------
-  # UI choose if stats show counts or weight.
-  output$stats_plot <- shiny::renderPlot({
-    if (input$stats == "Counts") {
-      df   <- dplyr::rename(counts_per_year, value = n_ids)
-      ylab <- "Number of fish (unique IDs)"
-    } else {
-      df   <- dplyr::rename(weights_per_year, value = total_weight)
-      ylab <- "Total weight (tonnes)"
-    }
+  # Main switcher for Statistics body
+  output$stats_body <- shiny::renderUI({
+    switch(
+      input$stats_mode,
+      "counts"     = shiny::plotOutput("counts_plot", height = "600px"),
+      "weights"    = shiny::plotOutput("weights_plot", height = "600px"),
+      "agecomp"    = shiny::plotOutput("agecomp_plot", height = "600px"),
+      "agesummary" = DT::dataTableOutput("age_summary_table", height = "600px")
+    )
+  })
 
-  # Plot stats per year plot.
+  # Counts per year
+  output$counts_plot <- shiny::renderPlot({
+    df <- dplyr::rename(counts_per_year, value = n_ids)
     ggplot2::ggplot(df, ggplot2::aes(year, value)) +
       ggplot2::geom_col(fill = "steelblue") +
-      ggplot2::labs(x = "Year", y = ylab,
-                    title = paste(input$stats, "of NSSH per year")) +
+      ggplot2::labs(x = "Year", y = "Number of fish (unique IDs)", title = "Counts per year") +
       ggplot2::theme_bw()
   })
 
-  # ------------------------------------------------------------------
-  # Age composition per year.
-  # ------------------------------------------------------------------
-  # Choose between agecomp_plot and age_summary_table.
-  output$age_plot <- shiny::renderUI({
-    if (input$age_mode == "comp") {
-      shiny::plotOutput("agecomp_plot")
-    } else {
-      DT::dataTableOutput("age_summary_table")
-    }
+  # Weights per year
+  output$weights_plot <- shiny::renderPlot({
+    df <- dplyr::rename(weights_per_year, value = total_weight) # adjust if your column is named differently
+    ggplot2::ggplot(df, ggplot2::aes(year, value)) +
+      ggplot2::geom_col(fill = "steelblue") +
+      ggplot2::labs(x = "Year", y = "Total weight", title = "Weights per year") +
+      ggplot2::theme_bw()
   })
 
-  # Plot of age composition in choosen year.
-    output$agecomp_plot <- shiny::renderPlot({
-      df <- dplyr::filter(age_counts, year == input$year)
+  # Age composition (selected year)
+  output$agecomp_plot <- shiny::renderPlot({
+    df <- dplyr::filter(age_counts, year == input$year)
+    shiny::validate(shiny::need(nrow(df) > 0, paste("No age data for", input$year)))
+    ggplot2::ggplot(df, ggplot2::aes(x = factor(age), y = n)) +
+      ggplot2::geom_col(fill = "steelblue") +
+      ggplot2::labs(x = "Age", y = "Count", title = paste("Age composition in", input$year)) +
+      ggplot2::theme_bw()
+  })
 
-      # Validate input from slider, that there is age data at input year.
-      shiny::validate(shiny::need(nrow(df) > 0, paste("No age data for", input$year)))
-
-      ggplot2::ggplot(df, ggplot2::aes(x = factor(age), y = n)) +
-        ggplot2::geom_col(fill = "steelblue") +
-        ggplot2::theme_bw() +
-        ggplot2::labs(
-          x = "Age",
-          y = "Count",
-          title = paste("Age composition in", input$year))
-    })
-
-  # Plot table of number of fish, mean and max age per year.
-    output$age_summary_table <- DT::renderDataTable({
-      age_summary
-    })
+  # Age summary (all years)
+  output$age_summary_table <- DT::renderDataTable({
+    age_summary
+  })
 
   # ------------------------------------------------------------------
   # Interactive map per year.
@@ -212,22 +257,30 @@ server <- function(input, output, session) {
   # Plot map.
   output$map <- leaflet::renderLeaflet({
     df <- filtered_catches()
-    validate(need(nrow(df) > 0, "No catch points for this year (after filtering)."))
+    validate(need(nrow(df) > 0, "No catch points for this year."))
+
     leaflet::leaflet(df) |>
       leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) |>
       leaflet::addCircleMarkers(
         lng = ~lon, lat = ~lat,
-        radius = 4,
+        radius = 5,
         fillColor = "steelblue",
         fillOpacity = 0.7,
         stroke = FALSE,
-        popup = ~paste0(
-          "<b>Year:</b> ", year, "<br>",
-          "<b>Fish:</b> ", n_fish, "<br>",
-          "<b>Lon:</b> ", round(lon, 3), "<br>",
-          "<b>Lat:</b> ", round(lat, 3)
-        )
-      ) |>
+        label = ~ htmltools::HTML(
+          paste0(
+          "<b>Year:</b> ", year, "<br/>",
+          "<b>Month:</b> ", month, "<br/>",
+          "<b>Number of fish:</b> ", n_fish, "<br/>",
+          "<b>Mean age:</b> ", mean_age, "<br>years<br/>",
+          "<b>Mean weight:</b> ", mean_weight, "<br>grams<br/>"
+          )
+        ),
+        labelOptions = leaflet::labelOptions(
+          style   = list("font-weight" = "normal", padding = "3px 8px"),
+          textsize = "13px",
+          direction = "auto"
+        )) |>
       leaflet::fitBounds(min(df$lon), min(df$lat), max(df$lon), max(df$lat))
   })
 }
