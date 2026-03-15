@@ -25,7 +25,6 @@ Imports:
     DT,
     dplyr,
     tibble,
-    targets,
     htmltools,
     tidyr,
     quarto

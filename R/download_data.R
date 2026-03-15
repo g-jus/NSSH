@@ -8,16 +8,3 @@ herring_read <- function() {
   return(data)
 }
 
-#' Cleans the NSSH file.
-#' @description
-#' This function is used to clean raw data from missing values, and converting
-#' to numerical values.
-#' @param data raw NSSH data.
-#' @return A `data.frame`
-#' @export
-cleaning_herring <- function(data) {
-  data |>
-    dplyr::filter(
-      weight > 0) |>
-    tidyr::drop_na(length, age, weight)
-}
