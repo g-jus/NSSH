@@ -6,9 +6,6 @@
 \usage{
 herring_read()
 }
-\arguments{
-\item{path}{Path to the csv file.}
-}
 \value{
 A \code{data.frame}
 }

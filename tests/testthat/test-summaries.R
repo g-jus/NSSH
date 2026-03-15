@@ -21,6 +21,6 @@ test_that("age_count_for_year works", {
     year = c(2000, 2001, 2001, 2002),
     age  = c(1,    2,    2,    3)
   )
-  age_out <- age_count_for_year(age_clean, 2001)
+  age_out <- age_count_for_year(age_clean)
   expect_equal(age_out$n[age_out$age == 2], 2)
 })

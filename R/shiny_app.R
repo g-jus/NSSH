@@ -26,7 +26,7 @@ ui <- bslib::page_navbar(
   bslib::nav_panel(
     "Home",
     bslib::layout_columns(
-      col_widths = c(5, 7),
+      col_widths = c(6, 6),
       bslib::card(
         bslib::card_body(
           shiny::tags$h3("Norwegian Spring-Spawning Herring (NSSH)"),
@@ -47,22 +47,17 @@ ui <- bslib::page_navbar(
           ),
         )
       ),
-      bslib::card(
-        bslib::card_body(
-          shiny::tags$figure(
-            class = "centerFigure",
-            shiny::tags$img(
+      shiny::tags$figure(
+          style = "text-align:center;",
+          shiny::tags$img(
               src = "https://www.norwegianseafoodcouncil.com/siteassets/wildfish/herring/herring_fishing_1280.jpg?width=900&height=506&transform=downFill&hash=bdd56fa473ad2a89b67baa108fe3ef9b",
-              width = 670,
-            ),
-            shiny::tags$figcaption(shiny::tags$strong("Photo:"), "Grette Hillersoey / Norwegian Seafood Council")
+              width = 520
           )
-        )
       )
     ),
     bslib::card(
       bslib::card_body(
-        shiny::tags$h5(
+        shiny::tags$h6(
           "Resources"
         ),
         shiny::tags$p(
@@ -70,9 +65,11 @@ ui <- bslib::page_navbar(
           "From: https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv"
         ),
         shiny::tags$p(
-        shiny::tags$strong("Source:"), "Institue of Marine Research (2025), Norwegian ",
+          shiny::tags$strong("Source:"), "Institue of Marine Research (2025), Norwegian ",
             "spring-spawning herring, From: https://www.hi.no/en/hi/temasider/species/herring"
-        )
+        ),
+        shiny::tags$p(
+          shiny::tags$strong("Photo:"), "Grette Hillersoey / Norwegian Seafood Council")
       )
     )
   ),
@@ -251,7 +248,16 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   # Map the catches filtered by input year.
   filtered_catches <- reactive({
-    dplyr::filter(catch_locations, year == input$map_year)
+    dplyr::filter(catch_locations, year == input$map_year) |>
+      dplyr::mutate(
+        label = paste0(
+          "<b>Year:</b> ", year, "<br/>",
+          "<b>Month:</b> ", month, "<br/>",
+          "<b>Number of fish:</b> ", n_fish, "<br/>",
+          "<b>Mean age:</b> ", mean_age, "<br> years<br/>",
+          "<b>Mean weight:</b> ", mean_weight, "<br> grams<br/>"
+        )
+      )
   })
 
   # Plot map.
@@ -267,15 +273,7 @@ server <- function(input, output, session) {
         fillColor = "steelblue",
         fillOpacity = 0.7,
         stroke = FALSE,
-        label = ~ htmltools::HTML(
-          paste0(
-          "<b>Year:</b> ", year, "<br/>",
-          "<b>Month:</b> ", month, "<br/>",
-          "<b>Number of fish:</b> ", n_fish, "<br/>",
-          "<b>Mean age:</b> ", mean_age, "<br>years<br/>",
-          "<b>Mean weight:</b> ", mean_weight, "<br>grams<br/>"
-          )
-        ),
+        label = lapply(df$label, htmltools::HTML),
         labelOptions = leaflet::labelOptions(
           style   = list("font-weight" = "normal", padding = "3px 8px"),
           textsize = "13px",
