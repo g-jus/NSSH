@@ -13,7 +13,7 @@ qc_age_ok|stem|d8a7b83b33dc74b7|824d01b30219d3ff|43e523828c940df8|-2081956410||t
 catch_locations_all|stem|3c67676a3712d0ac|5fe97be21479da08|82ee56bab4fc3f96|2025204766||t20525.7793676067s|s67828b|67828|rds|local|vector|||0.312||
 catch_locations_ocean|stem|f644a1182d4aef27|d879cf25c055383c|0dbcafc9a92a17d8|-671592819||t20525.7793683742s|s61725b|61725|rds|local|vector|||0||
 qc_mapping_coords|stem|d8a7b83b33dc74b7|7ba8f363d7e16dad|e900d289026f09e2|671577559||t20525.7793691014s|s48b|48|rds|local|vector|||0||
-ui|object|bda73e8c2f32a89c
+ui|object|140cef6895d9d56f
 cleaning_herring|function|2f42264a5dc46f5c
 gompertz_model|function|fc3790546d9d5921
 logistic_model|function|59e7317818283263
@@ -22,8 +22,8 @@ herring_read|function|cf57591d80eaa4b2
 age_count_for_year|function|a452ff92643a3e9f
 location_catches_summary|function|8f8020a26b32c36b
 weight_per_year|function|77f90b8136b34c06
-.Random.seed|object|7cddaab22550f8a0
+.Random.seed|object|a26d15599b4b318f
 filter_ocean_points|function|62928451a61a793b
 count_per_year|function|374fc4390838a8e1
-server|function|5225bd703e8996fb
-run_NSSH|function|4a8b866876d2c0bb
+server|function|b24e375f9e45848b
+run_NSSH|function|45c96082e74ca0e5
