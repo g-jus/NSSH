@@ -7,7 +7,7 @@
 #' @return A Shiny application object. Running this function launches the app.
 #'
 #' @examples
-#' \dontrun{
+#' {
 #'   run_NSSH()
 #' }
 #'
@@ -140,17 +140,16 @@ ui <- bslib::page_navbar(
 
 server <- function(input, output, session) {
 
-  data <- process_nssh_data()
+  herring_data <- process_nssh_data()
 
-  clean_herring <- data$clean_herring
-  growth_data_small <- data$growth_data_small
-  max_age <- data$max_age
-  counts_per_year <- data$counts_per_year
-  weights_per_year <- data$weights_per_year
-  age_counts <- data$age_counts
-  age_summary <- data$age_summary
-  map_summary <- data$map_summary
-  map_locations <- data$map_locations
+  clean_herring <- herring_data$clean_herring
+  growth_data_small <- herring_data$growth_data_small
+  max_age <- herring_data$max_age
+  counts_per_year <- herring_data$counts_per_year
+  weights_per_year <- herring_data$weights_per_year
+  age_counts <- herring_data$age_counts
+  age_summary <- herring_data$age_summary
+  map_summary <- herring_data$map_summary
   #-----------------------------------------------------------------------------
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
@@ -221,7 +220,7 @@ server <- function(input, output, session) {
 
   # Weights per year
   output$weights_plot <- shiny::renderPlot({
-    df <- dplyr::rename(weights_per_year, value = total_weight) # adjust if your column is named differently
+    df <- dplyr::rename(weights_per_year, value = total_weight)
     ggplot2::ggplot(df, ggplot2::aes(year, value)) +
       ggplot2::geom_col(fill = "steelblue") +
       ggplot2::labs(x = "Year", y = "Total weight", title = "Weights per year") +

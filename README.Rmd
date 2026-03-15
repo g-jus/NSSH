@@ -20,15 +20,15 @@ knitr::opts_chunk$set(
 
 # Herring Data Explorer
 
-The **Herring Data Explorer** is an R package that combines a fully interactive **Shiny application** with a reproducible **{targets} pipeline** for working with Norwegian Spring-Spawning Herring (NSSH) data.
+The **Herring Data Explorer** is an R package that combines a fully interactive **Shiny application** for working with Norwegian Spring-Spawning Herring (NSSH) data.
 
 The app provides:
 
-- Dynamic **growth model visualizations** (VBGM & Gompertz)
+- Dynamic **growth model visualizations** (VBGM, Gompertz & logistic)
 - Annual statistics such as **counts** and **weights** per year
 - Detailed **age composition** plots
+- Annual table of **mean age** and **weight** with total number of caught NSSH  
 - An interactive **leaflet map** of catch locations
-- A full `{targets}` pipeline for data import, cleaning, summarizing, and mapping
 
 The goal is to offer a clean, transparent, and reproducible workflow for herring data exploration.
 
