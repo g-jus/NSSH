@@ -140,18 +140,6 @@ ui <- bslib::page_navbar(
 
 server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
-  # Read precomputed targets
-  #-----------------------------------------------------------------------------
-  clean_herring      <- targets::tar_read(clean_herring)
-  growth_data_small  <- targets::tar_read(growth_data_small)
-  max_age            <- targets::tar_read(max_age)
-  counts_per_year    <- targets::tar_read(counts_per_year)
-  weights_per_year   <- targets::tar_read(weights_per_year)
-  age_counts         <- targets::tar_read(age_counts)
-  age_summary        <- targets::tar_read(age_summary_per_year)
-  catch_locations    <- targets::tar_read(catch_locations_ocean)
-
-  #-----------------------------------------------------------------------------
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
   # Default state for VBGM:
