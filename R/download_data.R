@@ -1,6 +1,7 @@
 #' Reads IMR NSSH file
 #' @description
-#' This function is to import the dataset from IMR's database.
+#' Function to import the raw NSSH dataset from the
+#' Institute of Marine Research database.
 #' @return A `data.frame`
 #' @export
 herring_read <- function() {

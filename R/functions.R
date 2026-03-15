@@ -1,8 +1,6 @@
-#' Cleans the NSSH file.
-#' @description
-#' This function is used to clean raw data from missing values, and converting
-#' to numerical values.
-#' @param data raw NSSH data.
+#' Function to clean raw data from missing values in columns with biological
+#' data.
+#' @param data raw fish (NSSH) data.
 #' @return A `data.frame`
 #' @export
 cleaning_herring <- function(data) {
@@ -12,8 +10,8 @@ cleaning_herring <- function(data) {
     tidyr::drop_na(length, age, weight)
 }
 
-#' Count fish per year using unique (id, indno) pairs.
-#' @param data A cleaned herring dataset.
+#' Counts fish per year using unique (id, indno) pairs.
+#' @param data A data frame with `year`, `id` and `indno`.
 #' @return A tibble with columns year and n_ids.
 #' @export
 count_per_year <- function(data) {
@@ -25,9 +23,8 @@ count_per_year <- function(data) {
     dplyr::arrange(year)
 }
 
-#' Count total weight (tonnes) of fish per year.
-#'
-#' @param data Cleaned herring dataset.
+#' Counts total weight (tonnes) of fish per year.
+#' @param data A data frame with `year` and individual `weight`.
 #' @return A tibble with columns year and total_weight.
 #' @export
 weight_per_year <- function(data) {
@@ -40,7 +37,7 @@ weight_per_year <- function(data) {
       )
 }
 
-#' Count ages for all years
+#' Counts number of fish per age for all years.
 #' @param data A data frame with at least columns `year` and `age`.
 #' @return A tibble with columns: year, age, n
 #' @export
@@ -64,11 +61,11 @@ age_summary_for_year <- function(data) {
     dplyr::arrange(year)
 }
 
-#' Count number of unique fish IDs per year per location (lat/lon) and adding
-#' filter for area of interest.
-#'
-#' @param data Cleaned herring dataset.
-#' @return A tibble with columns year, lon, lat, n_fish and ids.
+#' Counts number of fish per year per location (lat/lon), and calculates
+#' mean age and weight. Additionally adding a filter for area of
+#' interest of NSSH.
+#' @param data A data frame with at least columns `year`, `month`, `lat`, `lon`, `age` and `weight`.
+#' @return A tibble with columns year, month, lat, lon, n_fish, mean_age and mean_weight.
 #' @export
 location_catches_summary <- function(data) {
   data |>
