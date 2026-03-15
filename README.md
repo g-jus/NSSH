@@ -33,6 +33,6 @@ You can install the development version of NSSH from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("g-jus/NSSH")
+# install.packages("remotes")
+remotes::install_github("g-jus/NSSH")
 ```

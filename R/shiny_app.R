@@ -139,18 +139,18 @@ ui <- bslib::page_navbar(
 )
 
 server <- function(input, output, session) {
-  #-----------------------------------------------------------------------------
-  # Read precomputed targets
-  #-----------------------------------------------------------------------------
-  clean_herring      <- targets::tar_read(clean_herring)
-  growth_data_small  <- targets::tar_read(growth_data_small)
-  max_age            <- targets::tar_read(max_age)
-  counts_per_year    <- targets::tar_read(counts_per_year)
-  weights_per_year   <- targets::tar_read(weights_per_year)
-  age_counts         <- targets::tar_read(age_counts)
-  age_summary        <- targets::tar_read(age_summary_per_year)
-  catch_locations    <- targets::tar_read(catch_locations_ocean)
 
+  data <- process_nssh_data()
+
+  clean_herring <- data$clean_herring
+  growth_data_small <- data$growth_data_small
+  max_age <- data$max_age
+  counts_per_year <- data$counts_per_year
+  weights_per_year <- data$weights_per_year
+  age_counts <- data$age_counts
+  age_summary <- data$age_summary
+  map_summary <- data$map_summary
+  map_locations <- data$map_locations
   #-----------------------------------------------------------------------------
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   # Map the catches filtered by input year.
   filtered_catches <- reactive({
-    dplyr::filter(catch_locations, year == input$map_year) |>
+    dplyr::filter(map_summary, year == input$map_year) |>
       dplyr::mutate(
         label = paste0(
           "<b>Year:</b> ", year, "<br/>",
