@@ -7,7 +7,7 @@
 #' @return A Shiny application object. Running this function launches the app.
 #'
 #' @examples
-#' {
+#' \dontrun{
 #'   run_NSSH()
 #' }
 #'

@@ -2,16 +2,16 @@
 % Please edit documentation in R/functions.R
 \name{weight_per_year}
 \alias{weight_per_year}
-\title{Count total weight (tonnes) of fish per year.}
+\title{Counts total weight (tonnes) of fish per year.}
 \usage{
 weight_per_year(data)
 }
 \arguments{
-\item{data}{Cleaned herring dataset.}
+\item{data}{A data frame with \code{year} and individual \code{weight}.}
 }
 \value{
 A tibble with columns year and total_weight.
 }
 \description{
-Count total weight (tonnes) of fish per year.
+Counts total weight (tonnes) of fish per year.
 }

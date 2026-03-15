@@ -2,16 +2,16 @@
 % Please edit documentation in R/functions.R
 \name{count_per_year}
 \alias{count_per_year}
-\title{Count fish per year using unique (id, indno) pairs.}
+\title{Counts fish per year using unique (id, indno) pairs.}
 \usage{
 count_per_year(data)
 }
 \arguments{
-\item{data}{A cleaned herring dataset.}
+\item{data}{A data frame with \code{year}, \code{id} and \code{indno}.}
 }
 \value{
 A tibble with columns year and n_ids.
 }
 \description{
-Count fish per year using unique (id, indno) pairs.
+Counts fish per year using unique (id, indno) pairs.
 }
