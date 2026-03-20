@@ -10,7 +10,6 @@
 #' \dontrun{
 #'   run_NSSH()
 #' }
-#'
 #' @export
 run_NSSH <- function() {
   shiny::shinyApp(ui, server)
