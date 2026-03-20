@@ -6,6 +6,7 @@
 #'
 #' @return A Shiny application object. Running this function launches the app.
 #' @import bslib
+#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -192,7 +193,7 @@ server <- function(input, output, session) {
                          color = "steelblue", linewidth = 1.2) +
       ggplot2::labs(x = "Age (years)", y = "Length (cm)",
                     title = paste("Growth model:", input$model)) +
-      ggplot2::scale_x_continuous(breaks = seq(0, .data$max_age, by = 2)) +
+      ggplot2::scale_x_continuous(breaks = seq(0, max_age, by = 2)) +
       ggplot2::theme_bw()
   })
 
