@@ -5,6 +5,7 @@
 #' yearly statistics, age composition, and mapping of NSSH catch locations.
 #'
 #' @return A Shiny application object. Running this function launches the app.
+#' @import bslib
 #'
 #' @examples
 #' \dontrun{
@@ -185,13 +186,13 @@ server <- function(input, output, session) {
 
   # Plot growth models.
   output$growth_plot <- shiny::renderPlot({
-    ggplot2::ggplot(growth_data_small, ggplot2::aes(age, length)) +
+    ggplot2::ggplot(growth_data_small, ggplot2::aes(.data$age, .data$length)) +
       ggplot2::geom_point(color = "grey70", alpha = 0.2) +
-      ggplot2::geom_line(data = pred_data(), ggplot2::aes(age, length),
+      ggplot2::geom_line(data = pred_data(), ggplot2::aes(.data$age, .data$length),
                          color = "steelblue", linewidth = 1.2) +
       ggplot2::labs(x = "Age (years)", y = "Length (cm)",
                     title = paste("Growth model:", input$model)) +
-      ggplot2::scale_x_continuous(breaks = seq(0, max_age, by = 2)) +
+      ggplot2::scale_x_continuous(breaks = seq(0, .data$max_age, by = 2)) +
       ggplot2::theme_bw()
   })
 
@@ -211,8 +212,10 @@ server <- function(input, output, session) {
 
   # Counts per year
   output$counts_plot <- shiny::renderPlot({
-    df <- dplyr::rename(counts_per_year, value = n_ids)
-    ggplot2::ggplot(df, ggplot2::aes(year, value)) +
+
+    df <- dplyr::rename(counts_per_year, value = .data$n_ids)
+
+    ggplot2::ggplot(df, ggplot2::aes(.data$year, .data$value)) +
       ggplot2::geom_col(fill = "steelblue") +
       ggplot2::labs(x = "Year", y = "Number of fish (unique IDs)", title = "Counts per year") +
       ggplot2::theme_bw()
@@ -220,8 +223,10 @@ server <- function(input, output, session) {
 
   # Weights per year
   output$weights_plot <- shiny::renderPlot({
-    df <- dplyr::rename(weights_per_year, value = total_weight)
-    ggplot2::ggplot(df, ggplot2::aes(year, value)) +
+
+    df <- dplyr::rename(weights_per_year, value = .data$total_weight)
+
+    ggplot2::ggplot(df, ggplot2::aes(.data$year, .data$value)) +
       ggplot2::geom_col(fill = "steelblue") +
       ggplot2::labs(x = "Year", y = "Total weight", title = "Weights per year") +
       ggplot2::theme_bw()
@@ -229,9 +234,12 @@ server <- function(input, output, session) {
 
   # Age composition (selected year)
   output$agecomp_plot <- shiny::renderPlot({
-    df <- dplyr::filter(age_counts, year == input$year)
+
+    df <- dplyr::filter(age_counts, .data$year == input$year)
+
     shiny::validate(shiny::need(nrow(df) > 0, paste("No age data for", input$year)))
-    ggplot2::ggplot(df, ggplot2::aes(x = factor(age), y = n)) +
+
+    ggplot2::ggplot(df, ggplot2::aes(x = factor(.data$age), y = .data$n)) +
       ggplot2::geom_col(fill = "steelblue") +
       ggplot2::labs(x = "Age", y = "Count", title = paste("Age composition in", input$year)) +
       ggplot2::theme_bw()
@@ -247,27 +255,29 @@ server <- function(input, output, session) {
   # ------------------------------------------------------------------
   # Map the catches filtered by input year.
   filtered_catches <- shiny::reactive({
-    dplyr::filter(map_summary, year == input$map_year) |>
+    dplyr::filter(map_summary, .data$year == input$map_year) |>
       dplyr::mutate(
         label = paste0(
-          "<b>Year:</b> ", year, "<br/>",
-          "<b>Month:</b> ", month, "<br/>",
-          "<b>Number of fish:</b> ", n_fish, "<br/>",
-          "<b>Mean age:</b> ", mean_age, "<br> years<br/>",
-          "<b>Mean weight:</b> ", mean_weight, "<br> grams<br/>"
+          "<b>Year:</b> ", .data$year, "<br/>",
+          "<b>Month:</b> ", .data$month, "<br/>",
+          "<b>Number of fish:</b> ", .data$n_fish, "<br/>",
+          "<b>Mean age:</b> ", .data$mean_age, "<br> years<br/>",
+          "<b>Mean weight:</b> ", .data$mean_weight, "<br> grams<br/>"
         )
       )
   })
 
   # Plot map.
   output$map <- leaflet::renderLeaflet({
+
     df <- filtered_catches()
+
     shiny::validate(shiny::need(nrow(df) > 0, "No catch points for this year."))
 
     leaflet::leaflet(df) |>
       leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) |>
       leaflet::addCircleMarkers(
-        lng = ~lon, lat = ~lat,
+        lng = ~ lon, lat = ~ lat,
         radius = 5,
         fillColor = "steelblue",
         fillOpacity = 0.7,
