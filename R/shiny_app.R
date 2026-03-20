@@ -187,9 +187,9 @@ server <- function(input, output, session) {
 
   # Plot growth models.
   output$growth_plot <- shiny::renderPlot({
-    ggplot2::ggplot(growth_data_small, ggplot2::aes(.data$age, .data$length)) +
+    ggplot2::ggplot(growth_data_small, ggplot2::aes(age, length)) +
       ggplot2::geom_point(color = "grey70", alpha = 0.2) +
-      ggplot2::geom_line(data = pred_data(), ggplot2::aes(.data$age, .data$length),
+      ggplot2::geom_line(data = pred_data(), ggplot2::aes(age, length),
                          color = "steelblue", linewidth = 1.2) +
       ggplot2::labs(x = "Age (years)", y = "Length (cm)",
                     title = paste("Growth model:", input$model)) +
