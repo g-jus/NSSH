@@ -12,6 +12,7 @@
 #' }
 #' @export
 run_NSSH <- function() {
+  shiny::addResourcePath('prefix', system.file('www', package = "NSSH"))
   shiny::shinyApp(ui, server)
 }
 
@@ -49,7 +50,7 @@ ui <- bslib::page_navbar(
       shiny::tags$figure(
           style = "text-align:center;",
           shiny::tags$img(
-              src = "https://www.norwegianseafoodcouncil.com/siteassets/wildfish/herring/herring_fishing_1280.jpg?width=900&height=506&transform=downFill&hash=bdd56fa473ad2a89b67baa108fe3ef9b",
+              src = "prefix/nssh_herring.jpg",
               width = 520
           )
       )
@@ -245,7 +246,7 @@ server <- function(input, output, session) {
   # Interactive map per year.
   # ------------------------------------------------------------------
   # Map the catches filtered by input year.
-  filtered_catches <- reactive({
+  filtered_catches <- shiny::reactive({
     dplyr::filter(map_summary, year == input$map_year) |>
       dplyr::mutate(
         label = paste0(
@@ -261,7 +262,7 @@ server <- function(input, output, session) {
   # Plot map.
   output$map <- leaflet::renderLeaflet({
     df <- filtered_catches()
-    validate(need(nrow(df) > 0, "No catch points for this year."))
+    shiny::validate(shiny::need(nrow(df) > 0, "No catch points for this year."))
 
     leaflet::leaflet(df) |>
       leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) |>

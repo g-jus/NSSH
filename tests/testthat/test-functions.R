@@ -24,7 +24,8 @@ test_that("count_per_year works", {
 # Testing function weight_per_year.
 test_that("weight_per_year works", {
   weight_clean <- tibble::tibble(year = c(2000, 2001, 2002),
-                                 weight = c(100, 200, 250))
+                                 weight = c(100, 200, 250)
+  )
   weight_out <- weight_per_year(weight_clean)
   expect_equal(weight_out$total_weight[weight_out$year == 2001], 200/1e6)
 })
@@ -43,7 +44,7 @@ test_that("age_count_for_year works", {
 test_that("age_summary_for_year works", {
   age_clean <- tibble::tibble(
     year = c(2000, 2001, 2001, 2002),
-    age  = c(1,    2,    2,    3),
+    age  = c(1,    2,    2,    3)
   )
   age_out <- age_summary_for_year(age_clean)
   expect_equal(age_out$year,     c(2000, 2001, 2002))

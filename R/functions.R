@@ -6,8 +6,9 @@
 cleaning_herring <- function(data) {
   data |>
     dplyr::filter(
-      weight > 0) |>
-    tidyr::drop_na(length, age, weight)
+      .data[[weight]] > 0
+    ) |>
+    tidyr::drop_na("length", "age", "weight")
 }
 
 #' Counts fish per year using unique (id, indno) pairs.
@@ -17,10 +18,10 @@ cleaning_herring <- function(data) {
 count_per_year <- function(data) {
   data |>
     dplyr::summarise(
-      n_ids = dplyr::n_distinct(paste(id, indno, sep = "_")),
-      .by = year
+      n_ids = dplyr::n_distinct(paste(.data[[id]], .data[[indno]], sep = "_")),
+      .by = "year"
     ) |>
-    dplyr::arrange(year)
+    dplyr::arrange(.data[[year]])
 }
 
 #' Counts total weight (tonnes) of fish per year.
@@ -28,13 +29,12 @@ count_per_year <- function(data) {
 #' @return A tibble with columns year and total_weight.
 #' @export
 weight_per_year <- function(data) {
-  data$weight <- suppressWarnings(as.numeric(data$weight))
   data |>
-    dplyr::group_by(year) |>
+    dplyr::group_by(.data[[year]]) |>
     dplyr::summarise(
-      total_weight = sum(weight, na.rm = TRUE)/1e6,
+      total_weight = sum(.data[[weight]], na.rm = TRUE)/1e6,
       .groups = "drop"
-      )
+    )
 }
 
 #' Counts number of fish per age for all years.
@@ -43,8 +43,8 @@ weight_per_year <- function(data) {
 #' @export
 age_count_for_year <- function(data) {
   data |>
-    dplyr::count(year, age, name = "n") |>
-    dplyr::arrange(year, age)
+    dplyr::count(.data[[year]], .data[[age]], name = "n") |>
+    dplyr::arrange(.data[[year]], .data[[age]])
 }
 
 #' Makes a summary of max and mean ages for all years.
@@ -55,10 +55,11 @@ age_summary_for_year <- function(data) {
   data |>
     dplyr::summarise(
       n_fish = dplyr::n(),
-      mean_age = round(mean(age, na.rm = TRUE), 2),
-      max_age  = max(age, na.rm = TRUE),
-      .by = year) |>
-    dplyr::arrange(year)
+      mean_age = round(mean(.data[[age]], na.rm = TRUE), 2),
+      max_age  = max(.data[[age]], na.rm = TRUE),
+      .by = "year"
+    ) |>
+    dplyr::arrange(.data[[year]])
 }
 
 #' Counts number of fish per year per location (lat/lon), and calculates
@@ -71,12 +72,12 @@ location_catches_summary <- function(data) {
   data |>
     dplyr::summarise(
       n_fish = dplyr::n(),
-      mean_age = round(mean(age, na.rm = TRUE), 1),
-      mean_weight = round(mean(weight, na.rm = TRUE), 1),
-      .by = c(year, month, lon, lat)
+      mean_age = round(mean(.data$[[age]], na.rm = TRUE), 1),
+      mean_weight = round(mean(.data$[[weight]], na.rm = TRUE), 1),
+      .by = c("year", "month", "lon", "lat")
     ) |>
     dplyr::filter(
-      lon > -30, lon < 30,   # longitude range
-      lat > 30,  lat < 80    # latitude range
+      .data$[[lon]] > -30, .data$[[lon]] < 30,   # longitude range
+      .data$[[lat]] > 30,  .data$[[lat]] < 80    # latitude range
     )
 }

@@ -18,5 +18,4 @@ yearly statistics, age composition, and mapping of NSSH catch locations.
 \dontrun{
   run_NSSH()
 }
-
 }
