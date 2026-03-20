@@ -10,5 +10,6 @@ herring_read()
 A \code{data.frame}
 }
 \description{
-This function is to import the dataset from IMR's database.
+Function to import the raw NSSH dataset from the
+Institute of Marine Research database.
 }

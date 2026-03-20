@@ -2,17 +2,18 @@
 % Please edit documentation in R/functions.R
 \name{cleaning_herring}
 \alias{cleaning_herring}
-\title{Cleans the NSSH file.}
+\title{Function to clean raw data from missing values in columns with biological
+data.}
 \usage{
 cleaning_herring(data)
 }
 \arguments{
-\item{data}{raw NSSH data.}
+\item{data}{raw fish (NSSH) data.}
 }
 \value{
 A \code{data.frame}
 }
 \description{
-This function is used to clean raw data from missing values, and converting
-to numerical values.
+Function to clean raw data from missing values in columns with biological
+data.
 }

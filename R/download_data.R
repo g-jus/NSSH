@@ -5,7 +5,7 @@
 #' @return A `data.frame`
 #' @export
 herring_read <- function() {
-  data <- read.csv("https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv", na.strings = ".")
+  data <- utils::read.csv("https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv", na.strings = ".")
   return(data)
 }
 

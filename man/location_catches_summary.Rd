@@ -2,18 +2,20 @@
 % Please edit documentation in R/functions.R
 \name{location_catches_summary}
 \alias{location_catches_summary}
-\title{Count number of unique fish IDs per year per location (lat/lon) and adding
-filter for area of interest.}
+\title{Counts number of fish per year per location (lat/lon), and calculates
+mean age and weight. Additionally adding a filter for area of
+interest of NSSH.}
 \usage{
 location_catches_summary(data)
 }
 \arguments{
-\item{data}{Cleaned herring dataset.}
+\item{data}{A data frame with at least columns \code{year}, \code{month}, \code{lat}, \code{lon}, \code{age} and \code{weight}.}
 }
 \value{
-A tibble with columns year, lon, lat, n_fish and ids.
+A tibble with columns year, month, lat, lon, n_fish, mean_age and mean_weight.
 }
 \description{
-Count number of unique fish IDs per year per location (lat/lon) and adding
-filter for area of interest.
+Counts number of fish per year per location (lat/lon), and calculates
+mean age and weight. Additionally adding a filter for area of
+interest of NSSH.
 }

@@ -2,14 +2,17 @@
 % Please edit documentation in R/data_processing.R
 \name{process_nssh_data}
 \alias{process_nssh_data}
-\title{Process NSSH Data for Shiny App}
+\title{This function is used to process NSSH Data for Shiny App.
+Loads raw data and applies all processing steps provided by
+underlying NSSH package functions.}
 \usage{
 process_nssh_data()
 }
 \value{
-A list with processed datasets
+A list with processed datasets.
 }
 \description{
-Loads raw data and applies all processing steps
+This function is used to process NSSH Data for Shiny App.
+Loads raw data and applies all processing steps provided by
+underlying NSSH package functions.
 }
-\keyword{internal}

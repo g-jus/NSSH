@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{age_count_for_year}
 \alias{age_count_for_year}
-\title{Count ages for all years}
+\title{Counts number of fish per age for all years.}
 \usage{
 age_count_for_year(data)
 }
@@ -13,5 +13,5 @@ age_count_for_year(data)
 A tibble with columns: year, age, n
 }
 \description{
-Count ages for all years
+Counts number of fish per age for all years.
 }
