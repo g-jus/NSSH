@@ -19,5 +19,5 @@ logistic_model(t, Linf, k, t0)
 Length-at-age
 }
 \description{
-Logistic growth model
+Fits a logistic growth model to the selected data.
 }

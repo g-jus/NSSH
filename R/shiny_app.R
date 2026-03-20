@@ -1,4 +1,4 @@
-#' Launch the NSSH Data Explorer Shiny App
+#' Launch the NSSH Explorer (Shiny App)
 #'
 #' This function starts the Shiny application included in the package.
 #' The app provides interactive visualizations for growth models,

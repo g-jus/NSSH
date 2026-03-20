@@ -19,5 +19,5 @@ vbgm(t, L_inf, k, t0)
 Predicted length of NSSH.
 }
 \description{
-Von Bertalanffy Growth Model.
+Fits a VBGM to the selected data.
 }

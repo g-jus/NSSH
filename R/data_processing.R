@@ -1,6 +1,8 @@
+#' Process pipeline.
+#'
 #' This function is used to process NSSH Data for Shiny App.
-#' Loads raw data and applies all processing steps provided by
-#' underlying NSSH package functions.
+#' Loads raw data and applies all processing steps (whole pipeline)
+#' provided by underlying NSSH package functions.
 #' @return A list with processed datasets.
 #' @export
 

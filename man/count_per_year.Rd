@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{count_per_year}
 \alias{count_per_year}
-\title{Counts fish per year using unique (id, indno) pairs.}
+\title{Total count per year.}
 \usage{
 count_per_year(data)
 }
