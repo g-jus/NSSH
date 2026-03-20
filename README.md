@@ -8,11 +8,11 @@ Norwegian Spring Spawning Herring explorer
 [![R-CMD-check](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/g-jus/NSSH/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-# Herring Data Explorer
+# Norwegian Spring-Spawning Herring Explorer
 
-The **Herring Data Explorer** is an R package that combines a fully
-interactive **Shiny application** for working with Norwegian
-Spring-Spawning Herring (NSSH) data.
+The **NSSH Explorer** is an R package that combines a fully interactive
+**Shiny application** for working with Norwegian Spring-Spawning Herring
+(NSSH) data.
 
 The app provides:
 
@@ -35,3 +35,31 @@ You can install the development version of NSSH from
 # install.packages("remotes")
 remotes::install_github("g-jus/NSSH")
 ```
+
+Alternatively:
+
+``` r
+# install.packages("pak")
+pak::pak("g-jus/NSSH")
+```
+
+## Use package
+
+To launch the app use command:
+
+``` r
+NSSH::run_NSSH()
+```
+
+For further insight to different functions in the package see the help
+file.
+
+Here information about the underlying functions are provided. For
+insight in package structure, pipeline and syntax see
+[GitHub](https://github.com/g-jus/NSSH).
+
+This package will **not** be regularly updated or maintained, but
+potential debugs or adjustments can be suggested through pull request on
+[GitHub](https://github.com/g-jus/NSSH).
+
+*23.03.26 - Sundvor, G.*

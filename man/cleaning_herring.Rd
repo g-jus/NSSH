@@ -2,8 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{cleaning_herring}
 \alias{cleaning_herring}
-\title{Function to clean raw data from missing values in columns with biological
-data.}
+\title{Cleaning raw data.}
 \usage{
 cleaning_herring(data)
 }

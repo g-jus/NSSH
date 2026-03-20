@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{weight_per_year}
 \alias{weight_per_year}
-\title{Counts total weight (tonnes) of fish per year.}
+\title{Total weight per year.}
 \usage{
 weight_per_year(data)
 }

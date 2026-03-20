@@ -1,5 +1,6 @@
 #' Von Bertalanffy Growth Model.
 #'
+#' Fits a VBGM to the selected data.
 #' @param t Age.
 #' @param L_inf Asymptotic length.
 #' @param k Growth coefficient.
@@ -13,6 +14,7 @@ vbgm <- function(t, L_inf, k, t0) {
 
 #' Gompertz growth model.
 #'
+#' Fits a Gompertz growth model to the selected data.
 #' @param t Age.
 #' @param L_inf Asymptotic length.
 #' @param k Growth rate.
@@ -26,6 +28,7 @@ gompertz_model <- function(t, L_inf, k, a) {
 
 #' Logistic growth model
 #'
+#' Fits a logistic growth model to the selected data.
 #' @param t Age (numeric vector)
 #' @param Linf Asymptotic length
 #' @param k Growth rate

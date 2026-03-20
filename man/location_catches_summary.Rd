@@ -2,9 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{location_catches_summary}
 \alias{location_catches_summary}
-\title{Counts number of fish per year per location (lat/lon), and calculates
-mean age and weight. Additionally adding a filter for area of
-interest of NSSH.}
+\title{Location catches summary.}
 \usage{
 location_catches_summary(data)
 }

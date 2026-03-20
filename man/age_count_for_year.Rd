@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{age_count_for_year}
 \alias{age_count_for_year}
-\title{Counts number of fish per age for all years.}
+\title{Age count by year.}
 \usage{
 age_count_for_year(data)
 }

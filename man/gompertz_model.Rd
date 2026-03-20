@@ -19,5 +19,5 @@ gompertz_model(t, L_inf, k, a)
 Predicted length of NSSH.
 }
 \description{
-Gompertz growth model.
+Fits a Gompertz growth model to the selected data.
 }

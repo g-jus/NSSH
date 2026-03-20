@@ -1,3 +1,5 @@
+#' Cleaning raw data.
+#'
 #' Function to clean raw data from missing values in columns with biological
 #' data.
 #' @param data raw fish (NSSH) data.
@@ -12,6 +14,8 @@ cleaning_herring <- function(data) {
     tidyr::drop_na("length", "age", "weight")
 }
 
+#' Total count per year.
+#'
 #' Counts fish per year using unique (id, indno) pairs.
 #' @param data A data frame with `year`, `id` and `indno`.
 #' @return A tibble with columns year and n_ids.
@@ -25,6 +29,8 @@ count_per_year <- function(data) {
     dplyr::arrange(.data$year)
 }
 
+#' Total weight per year.
+#'
 #' Counts total weight (tonnes) of fish per year.
 #' @param data A data frame with `year` and individual `weight`.
 #' @return A tibble with columns year and total_weight.
@@ -38,6 +44,8 @@ weight_per_year <- function(data) {
     )
 }
 
+#' Age count by year.
+#'
 #' Counts number of fish per age for all years.
 #' @param data A data frame with at least columns `year` and `age`.
 #' @return A tibble with columns: year, age, n
@@ -48,6 +56,8 @@ age_count_for_year <- function(data) {
     dplyr::arrange(.data$year, .data$age)
 }
 
+#' Age summary by year.
+#'
 #' Makes a summary of max and mean ages for all years.
 #' @param data A data frame with at least columns `year` and `age`.
 #' @return A tibble with columns: year, age, n
@@ -63,6 +73,8 @@ age_summary_for_year <- function(data) {
     dplyr::arrange(.data$year)
 }
 
+#' Location catches summary.
+#'
 #' Counts number of fish per year per location (lat/lon), and calculates
 #' mean age and weight. Additionally adding a filter for area of
 #' interest of NSSH.

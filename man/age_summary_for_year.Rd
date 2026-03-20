@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{age_summary_for_year}
 \alias{age_summary_for_year}
-\title{Makes a summary of max and mean ages for all years.}
+\title{Age summary by year.}
 \usage{
 age_summary_for_year(data)
 }

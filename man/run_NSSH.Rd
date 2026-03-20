@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny_app.R
 \name{run_NSSH}
 \alias{run_NSSH}
-\title{Launch the NSSH Data Explorer Shiny App}
+\title{Launch the NSSH Explorer (Shiny App)}
 \usage{
 run_NSSH()
 }
