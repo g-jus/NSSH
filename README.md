@@ -36,13 +36,6 @@ You can install the development version of NSSH from
 remotes::install_github("g-jus/NSSH")
 ```
 
-Alternatively:
-
-``` r
-# install.packages("pak")
-pak::pak("g-jus/NSSH")
-```
-
 ## Use package
 
 To launch the app use command:
