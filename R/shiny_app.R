@@ -164,19 +164,18 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Default state for VBGM:
   shiny::observe({
-    shinyjs::enable("t0")
-    shinyjs::disable("a")
-  }, priority = -1
-  )
+    shinyjs::enable("t0", asis = TRUE)
+    shinyjs::disable("a", asis = TRUE)
+  })
 
   # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
   shiny::observeEvent(input$model, {
     if (input$model == "Gompertz") {
-      shinyjs::disable("t0")
-      shinyjs::enable("a")
+      shinyjs::disable("t0", asis = TRUE)
+      shinyjs::enable("a", asis = TRUE)
     } else {  # VBGM and logistic.
-      shinyjs::enable("t0")
-      shinyjs::disable("a")
+      shinyjs::enable("t0", asis = TRUE)
+      shinyjs::disable("a", asis = TRUE)
     }
   })
 
