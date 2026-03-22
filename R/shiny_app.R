@@ -21,124 +21,124 @@ run_NSSH <- function() {
 ui <- shiny::fluidPage(
   shinyjs::useShinyjs(),
   bslib::page_navbar(
-  title = "NSSH",
+    title = "NSSH",
 
-  # ----------------------------------------------------------------------------
-  # Front page.
-  # ----------------------------------------------------------------------------
-  bslib::nav_panel(
-    "Home",
-    bslib::layout_columns(
-      col_widths = c(6, 6),
+    # ----------------------------------------------------------------------------
+    # Front page.
+    # ----------------------------------------------------------------------------
+    bslib::nav_panel(
+      "Home",
+      bslib::layout_columns(
+        col_widths = c(6, 6),
+        bslib::card(
+          bslib::card_body(
+            shiny::tags$h3("Norwegian Spring-Spawning Herring (NSSH)"),
+            shiny::tags$p(
+              "This application provides tools for exploring and visualizing ",
+              "data from Norwegian spring-spawning herring. You can investigate ",
+              "growth models, yearly statistics, age composition, and ",
+              "geographical patterns in catches through plots and maps."
+            ),
+            shiny::tags$p(
+              "Norwegian spring-spawning herring (", shiny::tags$em("Clupea harengus"),  "L.)",
+              "is a pelagic saltwater fish belonging to the Atlanto-Scandian herring.",
+              "The NSSH is an important economical, cultural and historical fisheries ",
+              "resource in Norway. The NSSH spawn during spring months on the ",
+              "west and north-west coast of Norway, before the larvae drift toward ",
+              "their nursery regions in the Barents Sea. The juvenile herring ",
+              "migrate southward and join the spawning stock after 3-4 years."
+            ),
+          )
+        ),
+        shiny::tags$figure(
+            style = "text-align:center;",
+            shiny::tags$img(
+                src = "prefix/nssh_herring.jpg",
+                style = "max-width: 100%; height: auto;"
+            )
+        )
+      ),
       bslib::card(
         bslib::card_body(
-          shiny::tags$h3("Norwegian Spring-Spawning Herring (NSSH)"),
-          shiny::tags$p(
-            "This application provides tools for exploring and visualizing ",
-            "data from Norwegian spring-spawning herring. You can investigate ",
-            "growth models, yearly statistics, age composition, and ",
-            "geographical patterns in catches through plots and maps."
+          shiny::tags$h6(
+            "Resources"
           ),
           shiny::tags$p(
-            "Norwegian spring-spawning herring (", shiny::tags$em("Clupea harengus"),  "L.) is a pelagic ",
-            "saltwater fish belonging to the Atlanto-Scandian herring. The NSSH ",
-            "is an important economical, cultural and historical fisheries ",
-            "resource in Norway. The NSSH spawn during spring months on the ",
-            "west and north-west coast of Norway, before the larvae drift toward ",
-            "their nursery regions in the Barents Sea. The juvenile herring ",
-            "migrate southward and join the spawning stock after 3-4 years."
+            shiny::tags$strong("Data:"), "Institute of Marine Research (2022), HerringData [Data set] ",
+            "From: https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv"
           ),
+          shiny::tags$p(
+            shiny::tags$strong("Source:"), "Institue of Marine Research (2025), Norwegian ",
+              "spring-spawning herring, From: https://www.hi.no/en/hi/temasider/species/herring"
+          ),
+          shiny::tags$p(
+            shiny::tags$strong("Photo:"), "Grette Hillersoey / Norwegian Seafood Council")
         )
-      ),
-      shiny::tags$figure(
-          style = "text-align:center;",
-          shiny::tags$img(
-              src = "prefix/nssh_herring.jpg",
-              width = 520
-          )
       )
     ),
-    bslib::card(
-      bslib::card_body(
-        shiny::tags$h6(
-          "Resources"
+
+    # ----------------------------------------------------------------------------
+    # Growth models tab.
+    # ----------------------------------------------------------------------------
+    bslib::nav_panel(
+      "Growth Models",
+      bslib::layout_sidebar(
+        sidebar = bslib::sidebar(
+          shiny::selectInput("model", "Model", c("VBGM", "Gompertz", "Logistic")),
+          shiny::sliderInput("Linf", "Linf", min = 0, max = 70, value = 40),
+          shiny::sliderInput("k", "k", min = 0.01, max = 1, value = 0.2),
+          shiny::sliderInput("t0", "t0", min = -2, max = 2, value = 0),
+          shiny::sliderInput("a", "a", min = 0, max = 2, value = 1)
         ),
-        shiny::tags$p(
-          shiny::tags$strong("Data:"), "Institute of Marine Research (2022), HerringData [Data set] ",
-          "From: https://ftp.nmdc.no/nmdc/IMR/Herring/HerringData.csv"
-        ),
-        shiny::tags$p(
-          shiny::tags$strong("Source:"), "Institue of Marine Research (2025), Norwegian ",
-            "spring-spawning herring, From: https://www.hi.no/en/hi/temasider/species/herring"
-        ),
-        shiny::tags$p(
-          shiny::tags$strong("Photo:"), "Grette Hillersoey / Norwegian Seafood Council")
+        shiny::plotOutput("growth_plot")
       )
-    )
-  ),
+    ),
 
-  # ----------------------------------------------------------------------------
-  # Growth models tab.
-  # ----------------------------------------------------------------------------
-  bslib::nav_panel(
-    "Growth Models",
-    bslib::layout_sidebar(
-      sidebar = bslib::sidebar(
-        shiny::selectInput("model", "Model", c("VBGM", "Gompertz", "Logistic")),
-        shiny::sliderInput("Linf", "Linf", min = 0, max = 70, value = 40),
-        shiny::sliderInput("k", "k", min = 0.01, max = 1, value = 0.2),
-        shiny::sliderInput("t0", "t0", min = -2, max = 2, value = 0),
-        shiny::sliderInput("a", "a", min = 0, max = 2, value = 1)
-      ),
-      shiny::plotOutput("growth_plot")
-    )
-  ),
-
-  # ----------------------------------------------------------------------------
-  # Statistics per year tab
-  # ----------------------------------------------------------------------------
-  bslib::nav_panel(
-    "Statistics",
-    bslib::layout_sidebar(
-      sidebar = bslib::sidebar(
-        shiny::radioButtons(
-          "stats_mode", "Statistics overview",
-          c(
-            "Counts per year"     = "counts",
-            "Weights per year"    = "weights",
-            "Age composition"     = "agecomp",
-            "Age summary"         = "agesummary"
+    # ----------------------------------------------------------------------------
+    # Statistics per year tab
+    # ----------------------------------------------------------------------------
+    bslib::nav_panel(
+      "Statistics",
+      bslib::layout_sidebar(
+        sidebar = bslib::sidebar(
+          shiny::radioButtons(
+            "stats_mode", "Statistics overview",
+            c(
+              "Counted fish per year"     = "counts",
+              "Total weight per year"     = "weights",
+              "Age composition"           = "agecomp",
+              "Age summary"               = "agesummary"
+            )
+          ),
+          # Year slider for Age composition
+          shiny::conditionalPanel(
+            condition = "input.stats_mode == 'agecomp'",
+            shiny::sliderInput(
+              "year", "Year",
+              min = 1935, max = 2019, value = 2000,
+              sep = "", step = 1
+            )
           )
         ),
-        # Year slider for Age composition
-        shiny::conditionalPanel(
-          condition = "input.stats_mode == 'agecomp'",
+        shiny::uiOutput("stats_body")
+      )
+    ),
+    # ----------------------------------------------------------------------------
+    # Map of catch per year tab.
+    # ----------------------------------------------------------------------------
+    bslib::nav_panel(
+      "Map",
+      bslib::layout_sidebar(
+        sidebar = bslib::sidebar(
           shiny::sliderInput(
-            "year", "Year",
+            "map_year", "Year",
             min = 1935, max = 2019, value = 2000,
             sep = "", step = 1
-          )
-        )
-      ),
-      shiny::uiOutput("stats_body")
+            )
+        ),
+        leaflet::leafletOutput("map", height = "600px")
+      )
     )
-  ),
-  # ----------------------------------------------------------------------------
-  # Map of catch per year tab.
-  # ----------------------------------------------------------------------------
-  bslib::nav_panel(
-    "Map",
-    bslib::layout_sidebar(
-      sidebar = bslib::sidebar(
-        shiny::sliderInput(
-          "map_year", "Year",
-          min = 1935, max = 2019, value = 2000,
-          sep = "", step = 1
-          )
-      ),
-      leaflet::leafletOutput("map", height = "600px")
-    )
-  )
   )
 )
 
@@ -146,9 +146,10 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Data download and preparation
   #-----------------------------------------------------------------------------
-
+  # Runs whole data download and processing pipeline.
   herring_data <- process_nssh_data()
 
+  # Assign to separate df.
   clean_herring <- herring_data$clean_herring
   growth_data_small <- herring_data$growth_data_small
   max_age <- herring_data$max_age
@@ -162,15 +163,16 @@ server <- function(input, output, session) {
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
   # Default state for VBGM:
-  shinyjs::enable("t0")
-  shinyjs::disable("a")
-
-  # Enable/disable t0/a parameter for VBGM/Gompertz.
+  shiny::observe({
+    shinyjs::enable("t0")
+    shinyjs::disable("a")
+  })
+  # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
   shiny::observeEvent(input$model, {
     if (input$model == "Gompertz") {
       shinyjs::disable("t0")
       shinyjs::enable("a")
-    } else {  # VBGM
+    } else {  # VBGM and logistic.
       shinyjs::enable("t0")
       shinyjs::disable("a")
     }
@@ -200,13 +202,20 @@ server <- function(input, output, session) {
       ggplot2::labs(x = "Age (years)", y = "Length (cm)",
                     title = paste("Growth model:", input$model)) +
       ggplot2::scale_x_continuous(breaks = seq(0, max_age, by = 2)) +
-      ggplot2::theme_bw()
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        axis.title = ggplot2::element_text(size = 14, face = "bold"),
+        axis.text = ggplot2::element_text(size = 14, face = "bold"),
+        plot.title = ggplot2::element_text(size = 15, face = "bold"),
+        axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20)),
+        axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 20))
+      )
   })
 
   #-----------------------------------------------------------------------------
   # Stats per year.
   #-----------------------------------------------------------------------------
-  # Main switcher for Statistics body
+  # Main switcher for Statistics body.
   output$stats_body <- shiny::renderUI({
     switch(
       input$stats_mode,
@@ -217,29 +226,43 @@ server <- function(input, output, session) {
     )
   })
 
-  # Counts per year
+  # Counted fish per year.
   output$counts_plot <- shiny::renderPlot({
 
     df <- dplyr::rename(counts_per_year, value = .data$n_ids)
 
     ggplot2::ggplot(df, ggplot2::aes(.data$year, .data$value)) +
       ggplot2::geom_col(fill = "steelblue") +
-      ggplot2::labs(x = "Year", y = "Number of fish (unique IDs)", title = "Counts per year") +
-      ggplot2::theme_bw()
+      ggplot2::labs(x = "Year", y = "Number of fish (unique IDs)", title = "Number of fish per year") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        axis.title = ggplot2::element_text(size = 14, face = "bold"),
+        axis.text = ggplot2::element_text(size = 14, face = "bold"),
+        plot.title = ggplot2::element_text(size = 15, face = "bold"),
+        axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20)),
+        axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 20))
+      )
   })
 
-  # Weights per year
+  # Total weight per year.
   output$weights_plot <- shiny::renderPlot({
 
     df <- dplyr::rename(weights_per_year, value = .data$total_weight)
 
     ggplot2::ggplot(df, ggplot2::aes(.data$year, .data$value)) +
       ggplot2::geom_col(fill = "steelblue") +
-      ggplot2::labs(x = "Year", y = "Total weight", title = "Weights per year") +
-      ggplot2::theme_bw()
+      ggplot2::labs(x = "Year", y = "Total weight (tonnes)", title = "Total weight per year") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        axis.title = ggplot2::element_text(size = 14, face = "bold"),
+        axis.text = ggplot2::element_text(size = 14, face = "bold"),
+        plot.title = ggplot2::element_text(size = 15, face = "bold"),
+        axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20)),
+        axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 20))
+      )
   })
 
-  # Age composition (selected year)
+  # Age composition (selected year).
   output$agecomp_plot <- shiny::renderPlot({
 
     df <- dplyr::filter(age_counts, .data$year == input$year)
@@ -248,11 +271,18 @@ server <- function(input, output, session) {
 
     ggplot2::ggplot(df, ggplot2::aes(x = factor(.data$age), y = .data$n)) +
       ggplot2::geom_col(fill = "steelblue") +
-      ggplot2::labs(x = "Age", y = "Count", title = paste("Age composition in", input$year)) +
-      ggplot2::theme_bw()
+      ggplot2::labs(x = "Age (years)", y = "Number of fish (unique IDs)", title = paste("Age composition in", input$year)) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(
+        axis.title = ggplot2::element_text(size = 14, face = "bold"),
+        axis.text = ggplot2::element_text(size = 14, face = "bold"),
+        plot.title = ggplot2::element_text(size = 15, face = "bold"),
+        axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 20)),
+        axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 20))
+      )
   })
 
-  # Age summary (all years)
+  # Age summary table (all years).
   output$age_summary_table <- DT::renderDataTable({
     age_summary
   })
