@@ -18,9 +18,10 @@ run_NSSH <- function() {
   shiny::shinyApp(ui, server)
 }
 
-ui <- bslib::page_navbar(
+ui <- shiny::fluidPage(
+  shinyjs::useShinyjs(),
+  bslib::page_navbar(
   title = "NSSH",
-  header = shinyjs::useShinyjs(),
 
   # ----------------------------------------------------------------------------
   # Front page.
@@ -138,9 +139,13 @@ ui <- bslib::page_navbar(
       leaflet::leafletOutput("map", height = "600px")
     )
   )
+  )
 )
 
 server <- function(input, output, session) {
+  #-----------------------------------------------------------------------------
+  # Data download and preparation
+  #-----------------------------------------------------------------------------
 
   herring_data <- process_nssh_data()
 
@@ -152,6 +157,7 @@ server <- function(input, output, session) {
   age_counts <- herring_data$age_counts
   age_summary <- herring_data$age_summary
   map_summary <- herring_data$map_summary
+
   #-----------------------------------------------------------------------------
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
