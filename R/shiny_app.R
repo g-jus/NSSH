@@ -163,10 +163,11 @@ server <- function(input, output, session) {
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
   # Default state for VBGM:
-  shiny::observe({
+  # Default state for VBGM - ensure inputs exist before enabling/disabling
+  session$onFlush(function() {
     shinyjs::enable("t0")
     shinyjs::disable("a")
-  })
+  }, once = TRUE)
   # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
   shiny::observeEvent(input$model, {
     if (input$model == "Gompertz") {
