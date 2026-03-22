@@ -19,7 +19,6 @@ run_NSSH <- function() {
 }
 
 ui <- shiny::fluidPage(
-  shinyjs::useShinyjs(),
   bslib::page_navbar(
     title = "NSSH",
 
@@ -87,10 +86,16 @@ ui <- shiny::fluidPage(
           shiny::selectInput("model", "Model", c("VBGM", "Gompertz", "Logistic")),
           shiny::sliderInput("Linf", "Linf", min = 0, max = 70, value = 40),
           shiny::sliderInput("k", "k", min = 0.01, max = 1, value = 0.2),
-          shiny::sliderInput("t0", "t0", min = -2, max = 2, value = 0),
-          shiny::sliderInput("a", "a", min = 0, max = 2, value = 1)
+          shiny::conditionalPanel(
+            condition = "input.model != 'Gompertz'",
+            shiny::sliderInput("t0", "t0", min = -2, max = 2, value = 0)
+          ),
+          shiny::conditionalPanel(
+            condition = "input.model == 'Gompertz'",
+            shiny::sliderInput("a", "a", min = 0, max = 2, value = 1)
+          )
         ),
-        shiny::plotOutput("growth_plot")
+        shiny::plotOutput("growth_plot", height = "600px")
       )
     ),
 
@@ -176,17 +181,6 @@ server <- function(input, output, session) {
     }
 
     tibble::tibble(age = t, length = length_pred)
-  })
-
-  # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
-  shiny::observeEvent(input$model, {
-    if (input$model == "Gompertz") {
-      shinyjs::hide("t0", asis = TRUE)
-      shinyjs::show("a", asis = TRUE)
-    } else {  # VBGM and logistic.
-      shinyjs::show("t0", asis = TRUE)
-      shinyjs::hide("a", asis = TRUE)
-    }
   })
 
   # Plot growth models.
