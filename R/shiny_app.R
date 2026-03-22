@@ -162,22 +162,6 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # VBGM and Gompertz growth model
   #-----------------------------------------------------------------------------
-  # Default state for VBGM:
-  shiny::observe({
-    shinyjs::enable("t0", asis = TRUE)
-    shinyjs::disable("a", asis = TRUE)
-  })
-
-  # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
-  shiny::observeEvent(input$model, {
-    if (input$model == "Gompertz") {
-      shinyjs::disable("t0", asis = TRUE)
-      shinyjs::enable("a", asis = TRUE)
-    } else {  # VBGM and logistic.
-      shinyjs::enable("t0", asis = TRUE)
-      shinyjs::disable("a", asis = TRUE)
-    }
-  })
 
   # Predict growth models curves with input data from UI.
   pred_data <- shiny::reactive({
@@ -192,6 +176,17 @@ server <- function(input, output, session) {
     }
 
     tibble::tibble(age = t, length = length_pred)
+  })
+
+  # Enable/disable t0/a parameter for VBGM and logistic/Gompertz.
+  shiny::observeEvent(input$model, {
+    if (input$model == "Gompertz") {
+      shinyjs::hide("t0", asis = TRUE)
+      shinyjs::show("a", asis = TRUE)
+    } else {  # VBGM and logistic.
+      shinyjs::show("t0", asis = TRUE)
+      shinyjs::hide("a", asis = TRUE)
+    }
   })
 
   # Plot growth models.
